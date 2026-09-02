@@ -75,8 +75,7 @@ jobs:
         working-directory: ${{ runner.temp }}/source
         run: |
           set -euo pipefail
-          python -m pip install --disable-pip-version-check --no-build-isolation -e .
-          make release-gate
+          PYTHONPATH=src make release-gate
 
       - name: Publish verified readable source
         shell: bash
