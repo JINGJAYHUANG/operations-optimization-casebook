@@ -1,0 +1,95 @@
+name: Bootstrap verified public v0.1.0
+
+on:
+  push:
+    branches:
+      - feat/public-v0.1.0
+    paths:
+      - ".bootstrap/**"
+      - ".github/workflows/bootstrap-public-v010.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: operations-optimization-casebook-bootstrap-v010
+  cancel-in-progress: false
+
+jobs:
+  bootstrap:
+    if: github.actor != 'github-actions[bot]'
+    name: Verify archive, run release gate, and publish source
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+
+    steps:
+      - name: Check out feature branch
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 1
+          persist-credentials: true
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.13"
+          cache: ""
+
+      - name: Reconstruct and verify source archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat .bootstrap/source.tar.xz.b64.part-{00..10} > "$RUNNER_TEMP/source.tar.xz.b64"
+          test "$(wc -c < "$RUNNER_TEMP/source.tar.xz.b64")" -eq 84748
+          base64 --decode "$RUNNER_TEMP/source.tar.xz.b64" > "$RUNNER_TEMP/source.tar.xz"
+          test "$(wc -c < "$RUNNER_TEMP/source.tar.xz")" -eq 63560
+          printf '%s  %s\n' \
+            '5b17955e44639061b807cf8a59fc9d31b3bd99982dd0da6f12cb4949a3795274' \
+            "$RUNNER_TEMP/source.tar.xz" | sha256sum -c -
+
+      - name: Safely extract source
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/source"
+          ARCHIVE="$RUNNER_TEMP/source.tar.xz" DEST="$RUNNER_TEMP/source" python - <<'PY'
+          import os
+          import tarfile
+          from pathlib import Path
+
+          archive = Path(os.environ["ARCHIVE"])
+          destination = Path(os.environ["DEST"]).resolve()
+          with tarfile.open(archive, "r:xz") as bundle:
+              for member in bundle.getmembers():
+                  resolved = (destination / member.name).resolve()
+                  if resolved != destination and destination not in resolved.parents:
+                      raise SystemExit(f"unsafe archive path: {member.name}")
+                  if member.issym() or member.islnk() or member.isdev():
+                      raise SystemExit(f"unsafe archive member: {member.name}")
+              bundle.extractall(destination, filter="data")
+          PY
+          test "$(find "$RUNNER_TEMP/source" -type f | wc -l)" -eq 185
+
+      - name: Run exact release gate
+        shell: bash
+        working-directory: ${{ runner.temp }}/source
+        run: |
+          set -euo pipefail
+          python -m pip install --disable-pip-version-check --no-build-isolation -e .
+          make release-gate
+
+      - name: Publish verified readable source
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp .github/workflows/bootstrap-public-v010.yml "$RUNNER_TEMP/bootstrap-public-v010.yml"
+          find . -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
+          cp -a "$RUNNER_TEMP/source/." .
+          mkdir -p .github/workflows
+          cp "$RUNNER_TEMP/bootstrap-public-v010.yml" .github/workflows/bootstrap-public-v010.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --check
+          git commit -m "feat: publish verified operations optimization casebook v0.1.0"
+          git push origin HEAD:feat/public-v0.1.0
