@@ -1,0 +1,1 @@
+{"budget_slack":5.0,"decision":{"selected_projects":["automation","energy-upgrade","quality-lab","route-system"]},"feasible_portfolios":65,"objective":161.0,"optimality_gap":0.0,"risk_slack":5.0,"solver":"exact-binary-portfolio-enumeration","status":"optimal","strategic_score":26.0,"total_cost":95.0,"total_risk":13.0}

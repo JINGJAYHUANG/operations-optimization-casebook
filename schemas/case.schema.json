@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.test/opcase/case.schema.json",
+  "title": "Operations optimization case",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["schema_version", "case_id", "case_type", "title", "decision_context", "objective_sense", "data", "policy"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "case_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$"},
+    "case_type": {"enum": ["product_mix", "transportation", "assignment", "facility_location", "workforce_schedule", "newsvendor", "project_crashing", "vehicle_routing", "robust_choice", "capital_budgeting"]},
+    "title": {"type": "string", "minLength": 1},
+    "decision_context": {"type": "string", "minLength": 1},
+    "objective_sense": {"enum": ["min", "max"]},
+    "data": {"type": "object"},
+    "baseline_decision": {"type": "object"},
+    "stress_tests": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "patch"],
+        "properties": {
+          "name": {"type": "string", "minLength": 1},
+          "patch": {"type": "object"}
+        }
+      }
+    },
+    "policy": {"type": "object"},
+    "known_limitations": {"type": "array", "items": {"type": "string"}}
+  }
+}

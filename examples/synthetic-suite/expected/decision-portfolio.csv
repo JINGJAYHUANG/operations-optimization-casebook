@@ -1,0 +1,11 @@
+case_id,case_type,objective,decision_status,audit_passed,decision_stability_ratio,improvement,passed
+product-mix-capacity-allocation,product_mix,2640.0,recommended,True,0.3333333333333333,464.0,True
+transportation-network-allocation,transportation,350.0,recommended,True,0.0,0.0,True
+technician-task-assignment,assignment,23.0,recommended,True,0.3333333333333333,0.0,True
+regional-facility-location,facility_location,469.0,conditional,True,0.0,276.0,True
+weekly-workforce-coverage,workforce_schedule,906.0,recommended,True,0.3333333333333333,371.0,True
+seasonal-newsvendor-order,newsvendor,372.5,conditional,True,0.6666666666666666,56.5,True
+project-crashing-deadline,project_crashing,130.0,recommended,True,0.6666666666666666,230.0,True
+two-vehicle-routing,vehicle_routing,344.28580098256907,conditional,True,1.0,3.851648071345039,True
+robust-capacity-choice,robust_choice,252.375,conditional,True,0.3333333333333333,115.02499999999998,True
+capital-budget-portfolio,capital_budgeting,161.0,conditional,True,0.3333333333333333,53.0,True

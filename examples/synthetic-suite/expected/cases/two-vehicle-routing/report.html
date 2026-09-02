@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Capacitated two-vehicle routing plan</title>
+<style>
+:root{font-family:Inter,ui-sans-serif,system-ui,sans-serif;color:#172033;background:#f3f6fa}body{margin:0}main{max-width:1100px;margin:auto;padding:32px 18px 60px}.card{background:white;border:1px solid #dce3ed;border-radius:14px;padding:22px;margin-bottom:18px;box-shadow:0 8px 24px rgba(20,35,60,.05)}h1{margin:0 0 8px}.status{font-size:26px;font-weight:800}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-top:16px}.metric{background:#f6f8fb;border-radius:10px;padding:12px}.metric b{display:block;font-size:20px}table{width:100%;border-collapse:collapse}th,td{padding:9px;border-bottom:1px solid #e5eaf1;text-align:left}pre{overflow:auto;background:#101826;color:#e8eef7;padding:16px;border-radius:10px}.note{color:#59667a}@media(max-width:700px){table{display:block;overflow-x:auto}}
+</style></head><body><main>
+<section class="card"><h1>Capacitated two-vehicle routing plan</h1><div class="status">CONDITIONAL</div><p>Partition six customer stops across two vehicles and optimize visit order subject to vehicle capacity.</p><div class="grid"><div class="metric">Model<b>vehicle_routing</b></div><div class="metric">Objective<b>344.285801</b></div><div class="metric">Solver<b>exact-allocation-and-route-enumeration</b></div><div class="metric">Stability<b>100.0%</b></div></div></section>
+<section class="card"><h2>Decision</h2><pre>{
+  &quot;routes&quot;: [
+    [
+      &quot;c1&quot;,
+      &quot;c3&quot;,
+      &quot;c2&quot;
+    ],
+    [
+      &quot;c4&quot;,
+      &quot;c5&quot;,
+      &quot;c6&quot;
+    ]
+  ]
+}</pre></section>
+<section class="card"><h2>Audit gates</h2><table><thead><tr><th>Gate</th><th>Result</th></tr></thead><tbody><tr><td>solution_status_optimal</td><td>PASS</td></tr><tr><td>decision_feasible</td><td>PASS</td></tr><tr><td>objective_recomputed</td><td>PASS</td></tr><tr><td>optimality_certificate_exact</td><td>PASS</td></tr><tr><td>baseline_feasible</td><td>PASS</td></tr><tr><td>baseline_not_better</td><td>PASS</td></tr><tr><td>minimum_improvement_met</td><td>PASS</td></tr></tbody></table></section>
+<section class="card"><h2>Stress tests</h2><table><thead><tr><th>Stress</th><th>Status</th><th>Objective</th><th>Decision changed</th></tr></thead><tbody><tr><td>vehicle-capacity-minus-one</td><td>solved</td><td>344.285801</td><td>False</td></tr><tr><td>customer-c3-demand-plus-one</td><td>solved</td><td>344.285801</td><td>False</td></tr><tr><td>vehicle-fixed-cost-plus-30</td><td>solved</td><td>404.285801</td><td>False</td></tr></tbody></table></section>
+<section class="card"><h2>Implementation</h2><p><b>Owner:</b> Dispatch supervisor</p><h3>Hard failures</h3><ul><li>None</li></ul><h3>Conditions</h3><ul><li>human_approval_required</li></ul><p><b>Rollback trigger:</b> Re-route when a stop, demand quantity, travel restriction, or vehicle availability changes.</p></section>
+<section class="card note"><h2>Boundary</h2><p>An exact result applies only to this versioned synthetic model. It does not establish that a real operating system includes every constraint or that execution is authorized.</p></section>
+</main></body></html>

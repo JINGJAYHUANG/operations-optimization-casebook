@@ -1,0 +1,28 @@
+name: Bug report
+description: Report a reproducible solver, audit, evidence, or CLI defect.
+title: "bug: "
+labels: [bug]
+body:
+  - type: textarea
+    attributes:
+      label: Synthetic reproduction
+      description: Include the smallest public-safe case that reproduces the problem.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Expected and actual result
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: Version
+      placeholder: v0.1.0
+    validations:
+      required: true
+  - type: checkboxes
+    attributes:
+      label: Public boundary
+      options:
+        - label: I removed real company, employee, customer, route, commercial, and credential data.
+          required: true

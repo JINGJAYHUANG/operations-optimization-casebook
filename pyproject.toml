@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "operations-optimization-casebook"
+version = "0.1.0"
+description = "An auditable operations-research casebook with exact reference solvers, stress tests, and implementation gates."
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "MIT"}
+authors = [{name = "JINGJAYHUANG"}]
+keywords = ["operations-research", "optimization", "supply-chain", "scheduling", "decision-science", "audit"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Scientific/Engineering :: Mathematics",
+]
+dependencies = []
+
+[project.scripts]
+opcase = "opcase.cli:main"
+
+[project.urls]
+Repository = "https://github.com/JINGJAYHUANG/operations-optimization-casebook"
+Issues = "https://github.com/JINGJAYHUANG/operations-optimization-casebook/issues"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+opcase = ["data/*.json"]

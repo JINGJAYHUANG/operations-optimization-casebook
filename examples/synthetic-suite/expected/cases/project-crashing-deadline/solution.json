@@ -1,0 +1,1 @@
+{"critical_path":["A","D","E","F"],"decision":{"duration_by_activity":{"A":4.0,"B":4.0,"C":6.0,"D":2.0,"E":4.0,"F":2.0}},"direct_cost":130.0,"evaluated_plans":216,"objective":130.0,"optimality_gap":0.0,"project_duration":12.0,"solver":"exact-crash-option-enumeration","start_times":{"A":0.0,"B":0.0,"C":4.0,"D":4.0,"E":6.0,"F":10.0},"status":"optimal","tardiness":0.0}

@@ -1,0 +1,43 @@
+{
+  "case_id": "cyclic-project-negative-control",
+  "case_type": "project_crashing",
+  "currency": "synthetic_units",
+  "data": {
+    "activities": [
+      {
+        "id": "A",
+        "options": [
+          {
+            "cost": 0,
+            "duration": 1
+          }
+        ],
+        "predecessors": [
+          "B"
+        ]
+      },
+      {
+        "id": "B",
+        "options": [
+          {
+            "cost": 0,
+            "duration": 1
+          }
+        ],
+        "predecessors": [
+          "A"
+        ]
+      }
+    ],
+    "deadline": 5,
+    "tardiness_penalty": 10
+  },
+  "decision_context": "Demonstrate solver rejection of a cyclic precedence network.",
+  "objective_sense": "min",
+  "policy": {
+    "implementation_owner": "Test owner"
+  },
+  "schema_version": "1.0",
+  "stress_tests": [],
+  "title": "Cyclic project negative control"
+}

@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.test/opcase/decision.schema.json",
+  "title": "Implementation decision",
+  "type": "object",
+  "required": ["status", "case_id", "objective", "decision", "hard_failures", "conditions", "implementation_owner", "approval_required", "rollback_trigger", "monitoring_kpis"],
+  "properties": {
+    "status": {"enum": ["recommended", "conditional", "hold"]},
+    "case_id": {"type": "string"},
+    "objective": {"type": "number"},
+    "decision": {"type": "object"},
+    "hard_failures": {"type": "array", "items": {"type": "string"}},
+    "conditions": {"type": "array", "items": {"type": "string"}},
+    "implementation_owner": {"type": ["string", "null"]},
+    "approval_required": {"type": "boolean"},
+    "rollback_trigger": {"type": "string"},
+    "monitoring_kpis": {"type": "array", "items": {"type": "string"}}
+  }
+}

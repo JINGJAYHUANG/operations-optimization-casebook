@@ -1,0 +1,109 @@
+{
+  "baseline_decision": {
+    "routes": [
+      [
+        "c1",
+        "c2",
+        "c3"
+      ],
+      [
+        "c4",
+        "c5",
+        "c6"
+      ]
+    ]
+  },
+  "case_id": "two-vehicle-routing",
+  "case_type": "vehicle_routing",
+  "currency": "synthetic_units",
+  "data": {
+    "customers": [
+      {
+        "demand": 2,
+        "id": "c1",
+        "x": 2,
+        "y": 1
+      },
+      {
+        "demand": 3,
+        "id": "c2",
+        "x": 3,
+        "y": 4
+      },
+      {
+        "demand": 2,
+        "id": "c3",
+        "x": 5,
+        "y": 2
+      },
+      {
+        "demand": 3,
+        "id": "c4",
+        "x": -2,
+        "y": 3
+      },
+      {
+        "demand": 2,
+        "id": "c5",
+        "x": -4,
+        "y": 1
+      },
+      {
+        "demand": 3,
+        "id": "c6",
+        "x": -3,
+        "y": -2
+      }
+    ],
+    "depot": {
+      "x": 0,
+      "y": 0
+    },
+    "distance_cost": 10,
+    "vehicle_capacity": 9,
+    "vehicle_fixed_cost": 40,
+    "vehicles": 2
+  },
+  "decision_context": "Partition six customer stops across two vehicles and optimize visit order subject to vehicle capacity.",
+  "known_limitations": [
+    "Euclidean distance proxy",
+    "no time windows",
+    "no traffic"
+  ],
+  "objective_sense": "min",
+  "policy": {
+    "implementation_owner": "Dispatch supervisor",
+    "max_objective_degradation": 180,
+    "min_decision_stability_ratio": 0.0,
+    "min_improvement": 0,
+    "monitoring_kpis": [
+      "route distance",
+      "on-time delivery",
+      "vehicle utilization"
+    ],
+    "require_human_approval": true,
+    "rollback_trigger": "Re-route when a stop, demand quantity, travel restriction, or vehicle availability changes."
+  },
+  "schema_version": "1.0",
+  "stress_tests": [
+    {
+      "name": "vehicle-capacity-minus-one",
+      "patch": {
+        "data.vehicle_capacity": 8
+      }
+    },
+    {
+      "name": "customer-c3-demand-plus-one",
+      "patch": {
+        "data.customers.2.demand": 3
+      }
+    },
+    {
+      "name": "vehicle-fixed-cost-plus-30",
+      "patch": {
+        "data.vehicle_fixed_cost": 70
+      }
+    }
+  ],
+  "title": "Capacitated two-vehicle routing plan"
+}

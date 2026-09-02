@@ -1,0 +1,5 @@
+include README.md LICENSE CHANGELOG.md SECURITY.md CONTRIBUTING.md ROADMAP.md CITATION.cff
+recursive-include src/opcase/data *.json
+recursive-include examples *.json *.csv *.md
+recursive-include schemas *.json
+recursive-include docs *.md

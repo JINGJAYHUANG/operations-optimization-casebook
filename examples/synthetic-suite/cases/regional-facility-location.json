@@ -1,0 +1,137 @@
+{
+  "baseline_decision": {
+    "assignments": {
+      "zone-1": "alpha",
+      "zone-2": "bravo",
+      "zone-3": "charlie",
+      "zone-4": "delta",
+      "zone-5": "delta"
+    },
+    "open_facilities": [
+      "alpha",
+      "bravo",
+      "charlie",
+      "delta"
+    ]
+  },
+  "case_id": "regional-facility-location",
+  "case_type": "facility_location",
+  "currency": "synthetic_units",
+  "data": {
+    "customers": [
+      {
+        "demand": 10,
+        "id": "zone-1"
+      },
+      {
+        "demand": 12,
+        "id": "zone-2"
+      },
+      {
+        "demand": 8,
+        "id": "zone-3"
+      },
+      {
+        "demand": 14,
+        "id": "zone-4"
+      },
+      {
+        "demand": 9,
+        "id": "zone-5"
+      }
+    ],
+    "facilities": [
+      {
+        "capacity": 34,
+        "fixed_cost": 180,
+        "id": "alpha"
+      },
+      {
+        "capacity": 28,
+        "fixed_cost": 150,
+        "id": "bravo"
+      },
+      {
+        "capacity": 30,
+        "fixed_cost": 170,
+        "id": "charlie"
+      },
+      {
+        "capacity": 24,
+        "fixed_cost": 130,
+        "id": "delta"
+      }
+    ],
+    "shipping_cost": {
+      "alpha": {
+        "zone-1": 2,
+        "zone-2": 3,
+        "zone-3": 6,
+        "zone-4": 7,
+        "zone-5": 5
+      },
+      "bravo": {
+        "zone-1": 4,
+        "zone-2": 2,
+        "zone-3": 4,
+        "zone-4": 6,
+        "zone-5": 7
+      },
+      "charlie": {
+        "zone-1": 7,
+        "zone-2": 5,
+        "zone-3": 2,
+        "zone-4": 3,
+        "zone-5": 4
+      },
+      "delta": {
+        "zone-1": 6,
+        "zone-2": 7,
+        "zone-3": 5,
+        "zone-4": 2,
+        "zone-5": 3
+      }
+    }
+  },
+  "decision_context": "Select facilities and allocate five customer zones to minimize fixed and shipping cost while meeting facility capacities.",
+  "known_limitations": [
+    "single-source customer assignment",
+    "no disruption probability"
+  ],
+  "objective_sense": "min",
+  "policy": {
+    "implementation_owner": "Supply-chain design director",
+    "max_objective_degradation": 180,
+    "min_decision_stability_ratio": 0.34,
+    "min_improvement": 50,
+    "monitoring_kpis": [
+      "total landed cost",
+      "facility utilization",
+      "service distance"
+    ],
+    "require_human_approval": true,
+    "rollback_trigger": "Re-open the network design when demand, fixed cost, or usable capacity changes materially."
+  },
+  "schema_version": "1.0",
+  "stress_tests": [
+    {
+      "name": "zone-4-demand-plus-4",
+      "patch": {
+        "data.customers.3.demand": 18
+      }
+    },
+    {
+      "name": "delta-fixed-cost-plus-60",
+      "patch": {
+        "data.facilities.3.fixed_cost": 190
+      }
+    },
+    {
+      "name": "alpha-capacity-minus-8",
+      "patch": {
+        "data.facilities.0.capacity": 26
+      }
+    }
+  ],
+  "title": "Regional facility opening and customer allocation"
+}

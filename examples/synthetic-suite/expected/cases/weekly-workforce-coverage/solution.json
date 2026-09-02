@@ -1,0 +1,1 @@
+{"coverage":{"p1":4,"p2":5,"p3":6,"p4":5,"p5":4,"p6":3},"decision":{"workers_by_shift":{"early":0,"late":0,"mid":2,"split":4,"swing":3}},"feasible_schedules":6454,"objective":906.0,"optimality_gap":0.0,"overstaff":1,"solver":"exact-integer-enumeration","status":"optimal"}

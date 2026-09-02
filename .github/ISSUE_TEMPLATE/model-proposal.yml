@@ -1,0 +1,31 @@
+name: Model-family proposal
+description: Propose a new optimization model and its audit contract.
+title: "model: "
+labels: [enhancement]
+body:
+  - type: textarea
+    attributes:
+      label: Operational decision
+      description: What action changes, who owns it, and when is it decided?
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Variables, constraints, and objective
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Baseline, stress tests, and negative controls
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Solver assurance and independent verification
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Known limitations and implementation gate
+    validations:
+      required: true

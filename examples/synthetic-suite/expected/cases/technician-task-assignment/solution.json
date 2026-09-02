@@ -1,0 +1,1 @@
+{"candidate_matchings":96,"decision":{"assignments":{"tech-a":"inspection","tech-b":"calibration","tech-c":"repair","tech-d":"audit","tech-e":"training"}},"objective":23.0,"optimality_gap":0.0,"second_best_objective":25.0,"solver":"exact-permutation-enumeration","status":"optimal"}
