@@ -1,0 +1,168 @@
+{
+  "baseline_decision": {
+    "duration_by_activity": {
+      "A": 5,
+      "B": 4,
+      "C": 6,
+      "D": 3,
+      "E": 5,
+      "F": 2
+    }
+  },
+  "case_id": "project-crashing-deadline",
+  "case_type": "project_crashing",
+  "currency": "synthetic_units",
+  "data": {
+    "activities": [
+      {
+        "id": "A",
+        "options": [
+          {
+            "cost": 0,
+            "duration": 5
+          },
+          {
+            "cost": 45,
+            "duration": 4
+          },
+          {
+            "cost": 110,
+            "duration": 3
+          }
+        ],
+        "predecessors": []
+      },
+      {
+        "id": "B",
+        "options": [
+          {
+            "cost": 0,
+            "duration": 4
+          },
+          {
+            "cost": 35,
+            "duration": 3
+          }
+        ],
+        "predecessors": []
+      },
+      {
+        "id": "C",
+        "options": [
+          {
+            "cost": 0,
+            "duration": 6
+          },
+          {
+            "cost": 50,
+            "duration": 5
+          },
+          {
+            "cost": 125,
+            "duration": 4
+          }
+        ],
+        "predecessors": [
+          "A"
+        ]
+      },
+      {
+        "id": "D",
+        "options": [
+          {
+            "cost": 0,
+            "duration": 3
+          },
+          {
+            "cost": 30,
+            "duration": 2
+          }
+        ],
+        "predecessors": [
+          "A"
+        ]
+      },
+      {
+        "id": "E",
+        "options": [
+          {
+            "cost": 0,
+            "duration": 5
+          },
+          {
+            "cost": 55,
+            "duration": 4
+          },
+          {
+            "cost": 130,
+            "duration": 3
+          }
+        ],
+        "predecessors": [
+          "B",
+          "D"
+        ]
+      },
+      {
+        "id": "F",
+        "options": [
+          {
+            "cost": 0,
+            "duration": 2
+          },
+          {
+            "cost": 70,
+            "duration": 1
+          }
+        ],
+        "predecessors": [
+          "C",
+          "E"
+        ]
+      }
+    ],
+    "deadline": 12,
+    "tardiness_penalty": 120
+  },
+  "decision_context": "Choose activity duration-cost options to minimize direct cost plus tardiness penalty while preserving precedence logic.",
+  "known_limitations": [
+    "deterministic activity durations",
+    "no resource leveling"
+  ],
+  "objective_sense": "min",
+  "policy": {
+    "implementation_owner": "Program manager",
+    "max_objective_degradation": 200,
+    "min_decision_stability_ratio": 0.0,
+    "min_improvement": 100,
+    "monitoring_kpis": [
+      "project completion date",
+      "crash spend",
+      "critical-path variance"
+    ],
+    "require_human_approval": false,
+    "rollback_trigger": "Recompute after a critical-path duration estimate or deadline changes."
+  },
+  "schema_version": "1.0",
+  "stress_tests": [
+    {
+      "name": "deadline-tightened-by-one",
+      "patch": {
+        "data.deadline": 11
+      }
+    },
+    {
+      "name": "tardiness-penalty-halved",
+      "patch": {
+        "data.tardiness_penalty": 60
+      }
+    },
+    {
+      "name": "activity-c-crash-cost-plus-30",
+      "patch": {
+        "data.activities.2.options.1.cost": 80
+      }
+    }
+  ],
+  "title": "Project crashing with deadline penalty"
+}

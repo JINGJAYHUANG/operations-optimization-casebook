@@ -1,0 +1,26 @@
+{
+  "case_id": "infeasible-transport-negative-control",
+  "case_type": "transportation",
+  "currency": "synthetic_units",
+  "data": {
+    "costs": {
+      "a": {
+        "x": 1
+      }
+    },
+    "demand": {
+      "x": 12
+    },
+    "supply": {
+      "a": 10
+    }
+  },
+  "decision_context": "Demonstrate fail-closed validation when supply and demand do not balance.",
+  "objective_sense": "min",
+  "policy": {
+    "implementation_owner": "Test owner"
+  },
+  "schema_version": "1.0",
+  "stress_tests": [],
+  "title": "Infeasible transportation negative control"
+}

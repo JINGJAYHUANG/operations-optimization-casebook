@@ -1,0 +1,17 @@
+{
+  "cases": [
+    "cases/product-mix-capacity-allocation.json",
+    "cases/transportation-network-allocation.json",
+    "cases/technician-task-assignment.json",
+    "cases/regional-facility-location.json",
+    "cases/weekly-workforce-coverage.json",
+    "cases/seasonal-newsvendor-order.json",
+    "cases/project-crashing-deadline.json",
+    "cases/two-vehicle-routing.json",
+    "cases/robust-capacity-choice.json",
+    "cases/capital-budget-portfolio.json"
+  ],
+  "schema_version": "1.0",
+  "suite_id": "public-synthetic-operations-optimization-suite",
+  "title": "Public synthetic operations optimization reference suite"
+}

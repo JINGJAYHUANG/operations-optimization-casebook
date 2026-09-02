@@ -1,0 +1,135 @@
+{
+  "baseline_decision": {
+    "selected_projects": [
+      "quality-lab",
+      "cold-storage",
+      "route-system"
+    ]
+  },
+  "case_id": "capital-budget-portfolio",
+  "case_type": "capital_budgeting",
+  "currency": "synthetic_units",
+  "data": {
+    "budget": 100,
+    "exclusive_groups": [
+      [
+        "cold-storage",
+        "outsourced-warehouse"
+      ],
+      [
+        "automation",
+        "manual-expansion"
+      ]
+    ],
+    "projects": [
+      {
+        "cost": 35,
+        "id": "automation",
+        "requires": [],
+        "risk": 5,
+        "strategic_score": 8,
+        "value": 62
+      },
+      {
+        "cost": 20,
+        "id": "quality-lab",
+        "requires": [],
+        "risk": 3,
+        "strategic_score": 7,
+        "value": 34
+      },
+      {
+        "cost": 30,
+        "id": "cold-storage",
+        "requires": [],
+        "risk": 4,
+        "strategic_score": 6,
+        "value": 45
+      },
+      {
+        "cost": 18,
+        "id": "route-system",
+        "requires": [],
+        "risk": 3,
+        "strategic_score": 5,
+        "value": 29
+      },
+      {
+        "cost": 28,
+        "id": "advanced-planning",
+        "requires": [
+          "automation"
+        ],
+        "risk": 6,
+        "strategic_score": 9,
+        "value": 50
+      },
+      {
+        "cost": 24,
+        "id": "outsourced-warehouse",
+        "requires": [],
+        "risk": 7,
+        "strategic_score": 3,
+        "value": 31
+      },
+      {
+        "cost": 22,
+        "id": "energy-upgrade",
+        "requires": [],
+        "risk": 2,
+        "strategic_score": 6,
+        "value": 36
+      },
+      {
+        "cost": 32,
+        "id": "manual-expansion",
+        "requires": [],
+        "risk": 8,
+        "strategic_score": 2,
+        "value": 40
+      }
+    ],
+    "risk_budget": 18
+  },
+  "decision_context": "Select a portfolio of operating investments that maximizes modeled value within cash, risk, dependency, and mutual-exclusion constraints.",
+  "known_limitations": [
+    "additive value model",
+    "no inter-project synergies except explicit dependencies"
+  ],
+  "objective_sense": "max",
+  "policy": {
+    "implementation_owner": "Capital allocation committee",
+    "max_objective_degradation": 45,
+    "min_decision_stability_ratio": 0.0,
+    "min_improvement": 20,
+    "monitoring_kpis": [
+      "realized NPV",
+      "cash draw",
+      "risk consumption"
+    ],
+    "require_human_approval": true,
+    "rollback_trigger": "Re-rank when project cost, value, dependency, or risk estimates change materially."
+  },
+  "schema_version": "1.0",
+  "stress_tests": [
+    {
+      "name": "budget-minus-15",
+      "patch": {
+        "data.budget": 85
+      }
+    },
+    {
+      "name": "automation-value-minus-20",
+      "patch": {
+        "data.projects.0.value": 42
+      }
+    },
+    {
+      "name": "risk-budget-minus-3",
+      "patch": {
+        "data.risk_budget": 15
+      }
+    }
+  ],
+  "title": "Capital project portfolio with dependencies and risk budget"
+}

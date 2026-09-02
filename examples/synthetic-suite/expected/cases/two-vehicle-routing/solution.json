@@ -1,0 +1,1 @@
+{"decision":{"routes":[["c1","c3","c2"],["c4","c5","c6"]]},"feasible_allocations":26,"loads":[7.0,8.0],"objective":344.28580098256907,"optimality_gap":0.0,"solver":"exact-allocation-and-route-enumeration","status":"optimal","total_distance":26.42858009825691,"vehicles_used":2}

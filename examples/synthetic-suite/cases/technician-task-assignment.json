@@ -1,0 +1,107 @@
+{
+  "baseline_decision": {
+    "assignments": {
+      "tech-a": "inspection",
+      "tech-b": "calibration",
+      "tech-c": "repair",
+      "tech-d": "audit",
+      "tech-e": "training"
+    }
+  },
+  "case_id": "technician-task-assignment",
+  "case_type": "assignment",
+  "currency": "synthetic_units",
+  "data": {
+    "agents": [
+      "tech-a",
+      "tech-b",
+      "tech-c",
+      "tech-d",
+      "tech-e"
+    ],
+    "costs": {
+      "tech-a": {
+        "audit": 6,
+        "calibration": 9,
+        "inspection": 7,
+        "repair": 8,
+        "training": 10
+      },
+      "tech-b": {
+        "audit": 8,
+        "calibration": 5,
+        "inspection": 6,
+        "repair": 9,
+        "training": 7
+      },
+      "tech-c": {
+        "audit": null,
+        "calibration": 7,
+        "inspection": 8,
+        "repair": 4,
+        "training": 9
+      },
+      "tech-d": {
+        "audit": 4,
+        "calibration": 8,
+        "inspection": 9,
+        "repair": 6,
+        "training": 5
+      },
+      "tech-e": {
+        "audit": 9,
+        "calibration": 6,
+        "inspection": 5,
+        "repair": 7,
+        "training": 3
+      }
+    },
+    "tasks": [
+      "inspection",
+      "calibration",
+      "repair",
+      "audit",
+      "training"
+    ]
+  },
+  "decision_context": "Assign five technicians to five maintenance jobs exactly once while respecting one prohibited certification mismatch.",
+  "known_limitations": [
+    "one task per person",
+    "no travel-time sequencing"
+  ],
+  "objective_sense": "min",
+  "policy": {
+    "implementation_owner": "Maintenance coordinator",
+    "max_objective_degradation": 10,
+    "min_decision_stability_ratio": 0.0,
+    "min_improvement": 0,
+    "monitoring_kpis": [
+      "completion time",
+      "rework rate",
+      "certification compliance"
+    ],
+    "require_human_approval": false
+  },
+  "schema_version": "1.0",
+  "stress_tests": [
+    {
+      "name": "tech-e-training-delay",
+      "patch": {
+        "data.costs.tech-e.training": 8
+      }
+    },
+    {
+      "name": "repair-complexity-increase",
+      "patch": {
+        "data.costs.tech-c.repair": 7
+      }
+    },
+    {
+      "name": "audit-duration-reduction",
+      "patch": {
+        "data.costs.tech-a.audit": 3
+      }
+    }
+  ],
+  "title": "Technician-to-maintenance-task assignment"
+}

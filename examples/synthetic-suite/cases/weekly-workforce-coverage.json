@@ -1,0 +1,124 @@
+{
+  "baseline_decision": {
+    "workers_by_shift": {
+      "early": 3,
+      "late": 3,
+      "mid": 3,
+      "split": 1,
+      "swing": 1
+    }
+  },
+  "case_id": "weekly-workforce-coverage",
+  "case_type": "workforce_schedule",
+  "currency": "synthetic_units",
+  "data": {
+    "demand": {
+      "p1": 3,
+      "p2": 5,
+      "p3": 6,
+      "p4": 5,
+      "p5": 4,
+      "p6": 3
+    },
+    "periods": [
+      "p1",
+      "p2",
+      "p3",
+      "p4",
+      "p5",
+      "p6"
+    ],
+    "shifts": [
+      {
+        "cost": 120,
+        "covers": [
+          "p1",
+          "p2",
+          "p3"
+        ],
+        "id": "early",
+        "max_workers": 6
+      },
+      {
+        "cost": 125,
+        "covers": [
+          "p2",
+          "p3",
+          "p4"
+        ],
+        "id": "mid",
+        "max_workers": 6
+      },
+      {
+        "cost": 118,
+        "covers": [
+          "p4",
+          "p5",
+          "p6"
+        ],
+        "id": "late",
+        "max_workers": 6
+      },
+      {
+        "cost": 92,
+        "covers": [
+          "p1",
+          "p3",
+          "p5"
+        ],
+        "id": "split",
+        "max_workers": 5
+      },
+      {
+        "cost": 96,
+        "covers": [
+          "p2",
+          "p4",
+          "p6"
+        ],
+        "id": "swing",
+        "max_workers": 5
+      }
+    ]
+  },
+  "decision_context": "Select integer staffing by overlapping shifts to meet every period demand at minimum wage cost.",
+  "known_limitations": [
+    "aggregate skills",
+    "no individual preferences"
+  ],
+  "objective_sense": "min",
+  "policy": {
+    "implementation_owner": "Workforce planning manager",
+    "max_objective_degradation": 400,
+    "min_decision_stability_ratio": 0.0,
+    "min_improvement": 0,
+    "monitoring_kpis": [
+      "coverage shortfall",
+      "overtime",
+      "schedule acceptance"
+    ],
+    "require_human_approval": false
+  },
+  "schema_version": "1.0",
+  "stress_tests": [
+    {
+      "name": "period-4-demand-plus-2",
+      "patch": {
+        "data.demand.p4": 7
+      }
+    },
+    {
+      "name": "late-shift-cost-plus-20",
+      "patch": {
+        "data.shifts.2.cost": 138
+      }
+    },
+    {
+      "name": "split-shift-limit-minus-2",
+      "patch": {
+        "data.shifts.3.max_workers": 3
+      }
+    }
+  ],
+  "title": "Integer workforce coverage across six periods"
+}

@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.test/opcase/run-manifest.schema.json",
+  "title": "Optimization run manifest",
+  "type": "object",
+  "required": ["schema_version", "harness_version", "run_id", "case_id", "evaluated_at", "input_hashes", "output_hashes", "event_count", "final_event_hash"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "harness_version": {"type": "string"},
+    "run_id": {"type": "string"},
+    "case_id": {"type": "string"},
+    "evaluated_at": {"type": "string"},
+    "input_hashes": {"type": "object", "additionalProperties": {"type": "string", "pattern": "^[0-9a-f]{64}$"}},
+    "output_hashes": {"type": "object", "additionalProperties": {"type": "string", "pattern": "^[0-9a-f]{64}$"}},
+    "event_count": {"type": "integer", "minimum": 0},
+    "final_event_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}

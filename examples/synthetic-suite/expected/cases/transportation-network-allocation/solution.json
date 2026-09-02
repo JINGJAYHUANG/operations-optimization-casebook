@@ -1,0 +1,1 @@
+{"decision":{"shipments":{"east":{"hub-d":25.0},"north":{"hub-a":30.0,"hub-b":10.0},"south":{"hub-b":15.0,"hub-c":20.0}}},"flow":100.0,"objective":350.0,"optimality_gap":0.0,"solver":"successive-shortest-path-min-cost-flow","status":"optimal","used_lanes":5}

@@ -1,0 +1,1 @@
+{"capacity_slack":{"alpha":4.0,"delta":1.0},"decision":{"assignments":{"zone-1":"alpha","zone-2":"alpha","zone-3":"alpha","zone-4":"delta","zone-5":"delta"},"open_facilities":["alpha","delta"]},"evaluated_complete_assignments":5,"fixed_cost":310.0,"objective":469.0,"optimality_gap":0.0,"shipping_cost":159.0,"solver":"exact-facility-and-assignment-enumeration","status":"optimal"}

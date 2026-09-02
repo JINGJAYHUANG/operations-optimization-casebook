@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.test/opcase/solution.schema.json",
+  "title": "Optimization solution",
+  "type": "object",
+  "required": ["status", "solver", "objective", "decision", "optimality_gap"],
+  "properties": {
+    "status": {"const": "optimal"},
+    "solver": {"type": "string", "minLength": 1},
+    "objective": {"type": "number"},
+    "decision": {"type": "object"},
+    "optimality_gap": {"type": "number", "minimum": 0}
+  }
+}

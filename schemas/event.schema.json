@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.test/opcase/event.schema.json",
+  "title": "Hash-chained optimization event",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["seq", "ts", "run_id", "event_type", "payload", "previous_hash", "event_hash"],
+  "properties": {
+    "seq": {"type": "integer", "minimum": 0},
+    "ts": {"type": "string"},
+    "run_id": {"type": "string"},
+    "event_type": {"type": "string"},
+    "payload": {"type": "object"},
+    "previous_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "event_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}
