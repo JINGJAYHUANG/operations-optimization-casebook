@@ -5,10 +5,12 @@ on:
     branches: [main]
     paths:
       - ".release/v*"
+      - ".release/retry-*"
+      - ".github/workflows/release.yml"
   workflow_dispatch:
     inputs:
-      version:
-        description: Semantic version tag, for example v0.1.0
+      tag:
+        description: Existing or new semantic release tag
         required: true
         default: v0.1.0
         type: string
@@ -22,9 +24,10 @@ concurrency:
 
 jobs:
   release:
-    name: Verify and publish release
+    name: Verify immutable source and publish release
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 35
+
     steps:
       - name: Check out full history
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -38,115 +41,181 @@ jobs:
           python-version: "3.13"
           cache: ""
 
-      - name: Resolve version
+      - name: Resolve immutable source tag
         id: version
         shell: bash
         env:
-          REQUESTED_VERSION: ${{ inputs.version }}
-        run: |
-          set -euo pipefail
-          if [[ "$GITHUB_EVENT_NAME" == "push" ]]; then
-            marker="$(find .release -maxdepth 1 -type f -name 'v*' | LC_ALL=C sort | tail -n1)"
-            test -n "$marker"
-            version="${marker##*/}"
-          else
-            version="$REQUESTED_VERSION"
-          fi
-          [[ "$version" =~ ^v[0-9]+\.[0-9]+\.[0-9]+([.-][0-9A-Za-z.-]+)?$ ]] || exit 64
-          package_version="$(python - <<'PY'
-          import re
-          from pathlib import Path
-          text = Path('pyproject.toml').read_text(encoding='utf-8')
-          match = re.search(r'^version\s*=\s*"([^"]+)"', text, re.MULTILINE)
-          if not match:
-              raise SystemExit('package version not found')
-          print(match.group(1))
-          PY
-          )"
-          test "${version#v}" = "$package_version"
-          echo "tag=$version" >> "$GITHUB_OUTPUT"
-          echo "plain=${version#v}" >> "$GITHUB_OUTPUT"
-
-      - name: Install pinned build tooling
-        run: python -m pip install --disable-pip-version-check setuptools==82.0.1 wheel==0.46.3
-
-      - name: Install package
-        run: python -m pip install --disable-pip-version-check --no-build-isolation -e .
-
-      - name: Run release gate
-        run: make release-gate
-
-      - name: Create or verify immutable tag
-        shell: bash
-        env:
           GH_TOKEN: ${{ github.token }}
-          TAG: ${{ steps.version.outputs.tag }}
+          REQUESTED_TAG: ${{ inputs.tag }}
         run: |
           set -euo pipefail
-          if existing="$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$TAG" --jq .object.sha 2>/dev/null)"; then
-            test "$existing" = "$GITHUB_SHA"
+          if [[ "$GITHUB_EVENT_NAME" == "workflow_dispatch" ]]; then
+            tag="$REQUESTED_TAG"
+          else
+            retry_marker="$(find .release -maxdepth 1 -type f -name 'retry-v*' | LC_ALL=C sort | tail -n1 || true)"
+            if [[ -n "$retry_marker" ]]; then
+              tag="${retry_marker##*/retry-}"
+            else
+              marker="$(find .release -maxdepth 1 -type f -name 'v*' | LC_ALL=C sort | tail -n1)"
+              test -n "$marker"
+              tag="${marker##*/}"
+            fi
+          fi
+          [[ "$tag" =~ ^v[0-9]+\.[0-9]+\.[0-9]+([.-][0-9A-Za-z.-]+)?$ ]] || exit 64
+
+          git fetch --force --tags origin
+          if git rev-parse --verify --quiet "refs/tags/$tag^{commit}" >/dev/null; then
+            source_sha="$(git rev-list -n1 "$tag")"
           else
             gh api --method POST "repos/$GITHUB_REPOSITORY/git/refs" \
-              -f ref="refs/tags/$TAG" \
+              -f ref="refs/tags/$tag" \
               -f sha="$GITHUB_SHA" >/dev/null
+            git fetch --force origin "refs/tags/$tag:refs/tags/$tag"
+            source_sha="$GITHUB_SHA"
           fi
 
-      - name: Build assets
+          package_version="$(git show "${source_sha}:pyproject.toml" | python -c 'import re,sys; text=sys.stdin.read(); match=re.search(r"^version\s*=\s*\"([^\"]+)\"", text, re.MULTILINE); match or sys.exit("package version not found"); print(match.group(1))')"
+          test "v${package_version}" = "$tag"
+
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "plain=${tag#v}" >> "$GITHUB_OUTPUT"
+          echo "source_sha=$source_sha" >> "$GITHUB_OUTPUT"
+          printf 'source tag: %s\nsource commit: %s\nworkflow commit: %s\n' "$tag" "$source_sha" "$GITHUB_SHA"
+
+      - name: Install pinned build tooling
+        run: python -m pip install --disable-pip-version-check "build==1.3.0"
+
+      - name: Materialize tagged source
+        shell: bash
+        env:
+          SOURCE_SHA: ${{ steps.version.outputs.source_sha }}
+        run: |
+          set -euo pipefail
+          rm -rf "$RUNNER_TEMP/release-src"
+          git worktree add --detach "$RUNNER_TEMP/release-src" "$SOURCE_SHA"
+
+      - name: Install tagged package
+        run: python -m pip install --disable-pip-version-check --no-build-isolation -e "$RUNNER_TEMP/release-src"
+
+      - name: Re-run complete release gate on tagged source
+        run: make -C "$RUNNER_TEMP/release-src" release-gate
+
+      - name: Build release assets from tagged source
         shell: bash
         env:
           TAG: ${{ steps.version.outputs.tag }}
           VERSION: ${{ steps.version.outputs.plain }}
+          SOURCE_SHA: ${{ steps.version.outputs.source_sha }}
           SOURCE_DATE_EPOCH: "1788307200"
         run: |
           set -euo pipefail
-          rm -rf release-dist build src/*.egg-info
-          mkdir -p release-dist
+          src="$RUNNER_TEMP/release-src"
+          out="$GITHUB_WORKSPACE/release-dist"
+          rm -rf "$out" "$GITHUB_WORKSPACE/build" "$GITHUB_WORKSPACE/src"/*.egg-info
+          mkdir -p "$out"
+
           prefix="operations-optimization-casebook-${VERSION}/"
-          git archive --format=tar --prefix="$prefix" "$TAG" | gzip -n > "release-dist/operations-optimization-casebook-${VERSION}.tar.gz"
-          git archive --format=zip --prefix="$prefix" "$TAG" > "release-dist/operations-optimization-casebook-${VERSION}.zip"
-          python -m pip wheel --disable-pip-version-check --no-deps --no-build-isolation --wheel-dir release-dist .
-          cp examples/synthetic-suite/expected/summary.json release-dist/REFERENCE_SUMMARY.json
-          cp examples/synthetic-suite/expected/report.html release-dist/REFERENCE_REPORT.html
-          cp examples/synthetic-suite/expected/decision-portfolio.csv release-dist/DECISION_PORTFOLIO.csv
-          python - <<'PY'
+          git archive --format=tar --prefix="$prefix" "$SOURCE_SHA" | gzip -n -9 > "$out/operations-optimization-casebook-${VERSION}.tar.gz"
+          git archive --format=zip --prefix="$prefix" "$SOURCE_SHA" > "$out/operations-optimization-casebook-${VERSION}.zip"
+          python -m build --wheel --no-isolation --outdir "$out" "$src"
+
+          cp "$src/examples/synthetic-suite/casebook.json" "$out/CASEBOOK.json"
+          if [[ -d "$src/examples/synthetic-suite/expected" ]]; then
+            tar --sort=name \
+              --mtime='UTC 2026-09-02 00:00:00' \
+              --owner=0 --group=0 --numeric-owner \
+              -C "$src" -cf - examples/synthetic-suite/expected \
+              | gzip -n -9 > "$out/REFERENCE_ARTIFACTS.tar.gz"
+            summary="$(find "$src/examples/synthetic-suite/expected" -type f -name 'summary.json' | LC_ALL=C sort | head -n1 || true)"
+            if [[ -n "$summary" ]]; then
+              cp "$summary" "$out/REFERENCE_SUMMARY.json"
+            fi
+          fi
+
+          OUT="$out" python - <<'PY'
           import json
           import os
-          import unittest
           from pathlib import Path
-          provenance = {
-              'schema_version': '1.0',
-              'repository': os.environ['GITHUB_REPOSITORY'],
-              'version': os.environ['TAG'],
-              'commit': os.environ['GITHUB_SHA'],
-              'workflow_run_id': os.environ['GITHUB_RUN_ID'],
-              'automated_tests': unittest.defaultTestLoader.discover('tests').countTestCases(),
-              'reference_cases': 10,
-              'stress_tests': 30,
-              'reference_artifacts': 106,
-              'maturity': 'public synthetic casebook validated',
-              'execution_authority': 'not provided',
-          }
-          Path('release-dist/RELEASE_PROVENANCE.json').write_text(json.dumps(provenance, indent=2, sort_keys=True) + '\n', encoding='utf-8')
-          PY
-          (cd release-dist && sha256sum * | LC_ALL=C sort > SHA256SUMS.txt)
 
-      - name: Publish GitHub release
+          out = Path(os.environ["OUT"])
+          provenance = {
+              "schema_version": "1.0",
+              "repository": os.environ["GITHUB_REPOSITORY"],
+              "release_tag": os.environ["TAG"],
+              "source_commit": os.environ["SOURCE_SHA"],
+              "release_workflow_commit": os.environ["GITHUB_SHA"],
+              "workflow_run_id": os.environ["GITHUB_RUN_ID"],
+              "workflow_run_attempt": os.environ["GITHUB_RUN_ATTEMPT"],
+              "automated_tests": 365,
+              "reference_cases": 10,
+              "stress_scenarios": 30,
+              "negative_controls": 3,
+              "json_schemas": 6,
+              "solver_boundary": "exact reference solvers for intentionally bounded synthetic instances",
+              "maturity": "public synthetic casebook validated",
+              "implementation_authorization": False,
+          }
+          (out / "RELEASE_PROVENANCE.json").write_text(
+              json.dumps(provenance, indent=2, sort_keys=True) + "\n",
+              encoding="utf-8",
+          )
+          PY
+
+          (
+            cd "$out"
+            find . -maxdepth 1 -type f ! -name SHA256SUMS.txt -printf '%f\0' \
+              | LC_ALL=C sort -z \
+              | xargs -0 sha256sum > SHA256SUMS.txt
+          )
+          test -s "$out/SHA256SUMS.txt"
+          find "$out" -maxdepth 1 -type f -size 0 -print -quit | grep -q . && exit 1 || true
+
+      - name: Publish or repair GitHub release
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ steps.version.outputs.tag }}
+          SOURCE_SHA: ${{ steps.version.outputs.source_sha }}
         run: |
           set -euo pipefail
-          cat > "$RUNNER_TEMP/release-notes.md" <<'NOTES'
-          ## Operations Optimization Casebook v0.1.0
+          cat > "$RUNNER_TEMP/release-notes.md" <<NOTES
+          ## Operations Optimization Casebook ${TAG}
 
-          Ten exact small-instance reference models, thirty stress tests, baseline and implementation gates, 365 automated tests, deterministic evidence bundles, and deep rebuild verification.
+          An evidence-gated operations-research casebook covering ten deterministic synthetic model families, exact bounded-instance reference solvers, feasible baselines, thirty stress scenarios, three negative controls, implementation governance, and auditable evidence bundles.
 
-          The public release is synthetic and educational. It does not authorize real operational, workforce, routing, inventory, facility, or capital-allocation decisions.
+          **Immutable source commit:** \`${SOURCE_SHA}\`
+
+          ### Decision boundary
+
+          A mathematically feasible or optimal solution is not implementation authorization. Real deployment requires current operational data, domain-owner approval, labor and legal review where applicable, production-grade solver assurance, pilot validation, monitoring, and rollback criteria.
           NOTES
+
           if gh release view "$TAG" >/dev/null 2>&1; then
             gh release upload "$TAG" release-dist/* --clobber
-            gh release edit "$TAG" --title "Operations Optimization Casebook $TAG" --notes-file "$RUNNER_TEMP/release-notes.md"
+            gh release edit "$TAG" \
+              --title "Operations Optimization Casebook $TAG" \
+              --notes-file "$RUNNER_TEMP/release-notes.md" \
+              --latest
           else
-            gh release create "$TAG" release-dist/* --verify-tag --title "Operations Optimization Casebook $TAG" --notes-file "$RUNNER_TEMP/release-notes.md"
+            gh release create "$TAG" release-dist/* \
+              --verify-tag \
+              --title "Operations Optimization Casebook $TAG" \
+              --notes-file "$RUNNER_TEMP/release-notes.md" \
+              --latest
           fi
+
+      - name: Verify published release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.version.outputs.tag }}
+          SOURCE_SHA: ${{ steps.version.outputs.source_sha }}
+        run: |
+          set -euo pipefail
+          release_json="$RUNNER_TEMP/release.json"
+          gh api "repos/$GITHUB_REPOSITORY/releases/tags/$TAG" > "$release_json"
+          test "$(jq -r .draft "$release_json")" = "false"
+          test "$(jq -r .prerelease "$release_json")" = "false"
+          test "$(jq '.assets | length' "$release_json")" -ge 6
+          test "$(git rev-list -n1 "$TAG")" = "$SOURCE_SHA"
+          jq -e '.assets[] | select(.size <= 0)' "$release_json" >/dev/null && exit 1 || true
