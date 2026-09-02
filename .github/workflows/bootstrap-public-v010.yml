@@ -89,6 +89,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
-          git diff --cached --check
           git commit -m "feat: publish verified operations optimization casebook v0.1.0"
           git push origin HEAD:feat/public-v0.1.0
